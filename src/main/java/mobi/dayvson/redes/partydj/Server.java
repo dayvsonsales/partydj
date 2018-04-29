@@ -40,22 +40,25 @@ public class Server extends WebSocketServer {
         rooms.forEach(r -> {
             User user = r.getUserList().stream().filter(u -> u.getWebSocket().equals(webSocket)).findFirst().get();
             System.out.println("foi o " + user.getName());
-            sendMessageToAllUserOnRoom(r, user.getName() + " se desconectou", "Sala", "send_message");
             r.getUserList().removeIf(u -> u.getWebSocket().equals(webSocket));
+            sendMessageToAllUserOnRoom(r, user.getName() + " se desconectou", "Sala", "send_message");
         });
     }
 
     @Override
     public void onMessage(WebSocket webSocket, String s) {
         Message m = Protocol.proccess(s);
+        System.out.println(roomList);
 
         if(m == Message.CREATE_ROOM){
+            User user = new User(UUID.randomUUID(), s.split(":")[1], webSocket);
             String token = generateRoomToken();
             while(roomList.contains(new Room(token))){
                 token = generateRoomToken();
             }
 
             Room room = new Room(token);
+            room.addUser(user);
 
             roomList.add(room);
             webSocket.send("create_room:false:Sucesso ao criar a sala!:" + token);
@@ -71,8 +74,9 @@ public class Server extends WebSocketServer {
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
                 _room.addUser(new User(UUID.randomUUID(), name, webSocket));
-                webSocket.send("enter_room:false:Conectado com sucesso!:" + token);
-                sendMessageToAllUserOnRoom(room, name + " se conectou", "Sala", "enter_room");
+                webSocket.send("enter_room:false:Conectado com sucesso!:" + token + ":" + _room.getUserList().get(0).getName());
+                sendMessageToAllUserOnRoom(_room, name + " se conectou", "Sala", "enter_room");
+                return ;
             }
 
             webSocket.send("enter_room:true:Sala inexistente!:" + token);
@@ -91,7 +95,8 @@ public class Server extends WebSocketServer {
                 Video video = new Video(videoUrl, videoThumb);
                 room.addVideo(video);
                 webSocket.send("add_video:false:Vídeo adicionado com sucesso!:" + token + "");
-                sendMessageToAllUserOnRoom(room,"Vídeo adicionado por " + name, "Sala", "add_video");
+                sendMessageToAllUserOnRoom(_room,"Vídeo adicionado por " + name, "Sala", "add_video");
+                return ;
             }
 
             webSocket.send("add_video:true:Sala inexistente!:" + token);
@@ -105,6 +110,7 @@ public class Server extends WebSocketServer {
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
                 webSocket.send("list_video:false:" + _room.getVideoQueueJson() + ":" + token);
+                return ;
             }
 
             webSocket.send("list_video:true:Sala inexistente!:" + token);
@@ -118,6 +124,7 @@ public class Server extends WebSocketServer {
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
                 webSocket.send("get_video:false:" + _room.nextVideo() + ":" + token);
+                return ;
             }
             webSocket.send("get_video:true:Sala inexistente!:" + token);
         }
@@ -128,11 +135,15 @@ public class Server extends WebSocketServer {
             String message = contents[2];
             String user = contents[3];
 
+            System.out.println(token + message + user);
+
             Room room = new Room(token);
 
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
-                sendMessageToAllUserOnRoom(room, message, user, "receive_message");
+                System.out.println(_room);
+                sendMessageToAllUserOnRoom(_room, message, user, "receive_message");
+                return ;
             }
             webSocket.send("send_message:true:Sala inexistente!:" + token);
         }
@@ -154,10 +165,10 @@ public class Server extends WebSocketServer {
         return String.valueOf(uuid).substring(0, 6);
     }
 
-    private void sendMessageToAllUserOnRoom(Room room, String message, String send, String type){
+    private void sendMessageToAllUserOnRoom(Room room, String message, String sender, String type){
         room.getUserList().forEach(user -> {
-            user.getWebSocket().send("receive_message:false:" + message + ":" + send + ":" + type);
+            System.out.println(user.getName());
+            user.getWebSocket().send("receive_message:false:" + message + ":" + sender + ":" + type);
         });
     }
-
 }

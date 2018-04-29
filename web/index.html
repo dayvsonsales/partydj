@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zxx" class="no-js">
+
+<head>
+	<!-- Mobile Specific Meta -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Favicon-->
+	<link rel="shortcut icon" href="img/fav.png">
+	<!-- Author Meta -->
+	<meta name="author" content="CodePixar">
+	<!-- Meta Description -->
+	<meta name="description" content="">
+	<!-- Meta Keyword -->
+	<meta name="keywords" content="">
+	<!-- meta character set -->
+	<meta charset="UTF-8">
+	<!-- Site Title -->
+	<title>Party DJ</title>
+
+	<link href="https://fonts.googleapis.com/css?family=Poppins:100,300,500" rel="stylesheet">
+	<!--
+		CSS
+		============================================= -->
+	<link rel="stylesheet" href="css/magnific-popup.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/main.css">
+</head>
+
+<body class="dup-body">
+	<div class="dup-body-wrap">
+
+		<!-- End Header Area -->
+		<!-- Start Banner Area -->
+		<section id="secao-inicial" class="generic-banner relative" >
+			<div class="container">
+				<div class="row height align-items-center justify-content-center">
+					<div class="col-lg-10">
+						<div class="banner-content text-center">
+							<h1><b>party.dj</b></h1>
+							<h2>Crie uma sala ou entre em uma para começar</h2>
+							<div class="form">
+								<div class="form-group">
+									Nome:
+									<input type="text" id="nome" />
+									<button onclick="criarSala()" class="btn btn-success">Criar Sala</button>
+								</div>
+								<div class="form-group">
+									<label for="token-sala">Token da sala: </label>
+									<input id="token-sala" class="form-group input" />
+									<button onclick="entrarSala()" class="btn btn-success" id="entrar">Entrar</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- End Banner Area -->
+		<!-- Start Video Area -->
+		<section id="secao-sala" class="section-gap achivement-area" style="display: none">
+				<div class="container">
+					<span id="numero-usuarios">10</span> usuários online
+					<div class="row align-items-center">
+						<div class="col-lg-5">
+							<div class="achivement-content">
+								<h2>Lobby do <span id="nome-dono"></span></h2>
+								Token <span id="numero-token-sala"></span>
+								<ul class="list-group frame" id="chat">
+
+								</ul>
+								<br>
+								<div class="container">
+									<div class="row">
+										<input id="enter" type="text" placeholder="Digite uma mensagem e tecle enter" style="width: 100%"/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div id="video">
+								<iframe width="560" height="315" src="https://www.youtube.com/embed/YR5ApYxkU-U?controls=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+							</div>
+							<a href="#popup-gg" class="open-popup btn btn-success" style="margin: auto; display: block;">
+								Pedir música
+							</a>
+							<br><br>
+							<div class="row">
+								<div class="col-md-6">
+									<b>Próximo vídeo:</b> <span id="">lalalalal de Marinay</span>
+								</div>
+								<div class="col-md-6">
+									7 vídeos na fila
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="popup-gg" class="white-popup mfp-hide">
+						<div class="container">
+							<input id="video-search" placeholder="Digite o nome do vídeo e tecle enter" class="input-group" type="text"/>
+							<br>
+							Selecione o vídeo que você deseja incluir na fila
+							<ul id="list-video" class="list-group">
+								<li class="list-group-item">Video</li>
+								<li class="list-group-item">Video</li>
+								<li class="list-group-item">Video</li>
+							</ul>
+							<br>
+
+						</div>
+					</div>
+
+				</div>
+			</section>
+		<!-- End Video Area -->
+	</div>
+
+	<script src="js/vendor/jquery-2.2.4.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+	    crossorigin="anonymous"></script>
+	<script src="js/vendor/bootstrap.min.js"></script>
+	<script src="js/jquery.ajaxchimp.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/jquery.nice-select.min.js"></script>
+	<script src="js/jquery.magnific-popup.min.js"></script>
+	<script src="js/main.js"></script>
+	<script src="js/socket.js"></script>
+</body>
+
+</html>

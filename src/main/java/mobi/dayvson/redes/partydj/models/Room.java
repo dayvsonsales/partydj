@@ -2,10 +2,7 @@ package mobi.dayvson.redes.partydj.models;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class Room {
 
@@ -45,4 +42,20 @@ public class Room {
         return new Gson().toJson(videoQueue);
     }
 
+    public String toString(){
+        return this.roomToken + " " + userList.size() + " " + videoQueue.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room room = (Room) o;
+        return Objects.equals(roomToken, room.roomToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roomToken);
+    }
 }
