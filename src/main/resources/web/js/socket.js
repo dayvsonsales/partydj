@@ -92,9 +92,14 @@ socket.onmessage = function (ev) {
 
 };
 
-var pedirMusica = function () {
-    console.log("aqui");
+var pedirMusica = function (title, thumbnailUrl, videoId) {
 
+
+    $.magnificPopup.close();
+
+    console.log(videoId);
+    console.log(thumbnailUrl);
+    console.log(title);
 };
 
 $("#enter").keyup(function (e){
@@ -104,6 +109,32 @@ $("#enter").keyup(function (e){
             $("#enter").val("");
         }
 });
+
+$("#video-search").keyup(function (e){
+        if(e.which == 13){
+            let q = $("#video-search").val();
+            console.log(q);
+            $.ajax({
+                url: 'https://www.googleapis.com/youtube/v3/search',
+                type: 'GET',
+                data: {
+                    'key' : 'AIzaSyC0dipLBJBsxKil4F6g-jBXhQPzcQ6EtTQ',
+                    'q' : q,
+                    'part' : 'snippet',
+                    'type': "video",
+                    'maxResults' : 10
+                }
+            }).done(function (r) {
+                r.items.forEach((p, k) => {
+                    let v = p.snippet;
+                    let videoId = p.id.videoId;
+                    $("#list-video").append(`<li class="list-group-item"><div class="row"><div class="col-md-4"><img src="${v.thumbnails.default.url}"/></div><div class="col-md-4">${v.title}</div><div class="col-md-4"><button class="btn btn-success" onclick="pedirMusica('${v.title}, '${v.thumbnails.default.url}, '${videoId}')">+</button></div></div></li>`);
+                });
+            });
+        }
+});
+
+
 
 $(".open-popup").magnificPopup({
     type: "inline",
