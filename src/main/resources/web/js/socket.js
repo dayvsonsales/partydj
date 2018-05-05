@@ -112,9 +112,9 @@ socket.onmessage = function (ev) {
             $("#video").val("");
 
             if(arr[5]){
-                $("#video").append(`<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?controls=0&autoplay=1&start=${arr[5]}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`);
+                $("#video").append(`<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?controls=0&autoplay=1&start=${arr[5]}&disablekb=1&showinfo=0&fs=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`);
             }else{
-                $("#video").append(`<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?controls=0&autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`);
+                $("#video").append(`<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?controls=0&autoplay=1&disablekb=1&showinfo=0&fs=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`);
             }
         }
     }
