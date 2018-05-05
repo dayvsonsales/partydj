@@ -60,6 +60,8 @@ public class Server extends WebSocketServer {
             Room room = new Room(token);
             room.addUser(user);
 
+            new Thread(room).start();
+
             roomList.add(room);
             webSocket.send("create_room:false:Sucesso ao criar a sala!:" + token);
         }
@@ -88,12 +90,18 @@ public class Server extends WebSocketServer {
             String name = contents[2];
             String videoUrl = contents[3];
             String videoThumb = contents[4];
+            String videoDuration = contents[5];
+            String videoName = contents[6];
+
+            System.out.println(name + "" + videoDuration + "" + videoUrl + "" + videoThumb);
+
             Room room = new Room(token);
+            System.out.println(token);
 
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
-                Video video = new Video(videoUrl, videoThumb);
-                room.addVideo(video);
+                Video video = new Video(videoUrl, videoThumb, videoDuration, videoName);
+                _room.addVideo(video);
                 webSocket.send("add_video:false:Vídeo adicionado com sucesso!:" + token + "");
                 sendMessageToAllUserOnRoom(_room,"Vídeo adicionado por " + name, "Sala", "add_video");
                 return ;
@@ -167,8 +175,7 @@ public class Server extends WebSocketServer {
 
     private void sendMessageToAllUserOnRoom(Room room, String message, String sender, String type){
         room.getUserList().forEach(user -> {
-            System.out.println(user.getName());
-            user.getWebSocket().send("receive_message:false:" + message + ":" + sender + ":" + type);
+            user.getWebSocket().send("receive_message:false:" + message + ":" + sender + ":" + type + ":" + room.getUserList().size() + ":" + room.queueCount());
         });
     }
 }
