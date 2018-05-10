@@ -1,4 +1,4 @@
-# Party.dj
+# Projeto de redes 1: Party.dj
 
 Party.dj é uma aplicação baseada no plug.dj, a qual consiste em compartilhar e descobrir músicas entre amigos.  
 Utilizando a API do YouTube, é possível criar uma sala, convidar seus amigos passando-os o token desta sala e usufruir de uma experiência de compartilhamento de vídeos, em especial músicas.  
