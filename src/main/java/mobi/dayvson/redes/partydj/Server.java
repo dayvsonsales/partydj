@@ -63,7 +63,7 @@ public class Server extends WebSocketServer {
             new Thread(room).start();
 
             roomList.add(room);
-            webSocket.send("create_room:false:Sucesso ao criar a sala!:" + token);
+            webSocket.send("create_room:0:Sucesso ao criar a sala!:" + token);
         }
 
         if(m == Message.ENTER_ROOM){
@@ -76,12 +76,12 @@ public class Server extends WebSocketServer {
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
                 _room.addUser(new User(UUID.randomUUID(), name, webSocket));
-                webSocket.send("enter_room:false:Conectado com sucesso!:" + token + ":" + _room.getUserList().get(0).getName());
+                webSocket.send("enter_room:0:Conectado com sucesso!:" + token + ":" + _room.getUserList().get(0).getName());
                 sendMessageToAllUserOnRoom(_room, name + " se conectou", "Sala", "enter_room");
                 return ;
             }
 
-            webSocket.send("enter_room:true:Sala inexistente!:" + token);
+            webSocket.send("enter_room:1:Sala inexistente!:" + token);
         }
 
         if(m == Message.ADD_VIDEO){
@@ -102,12 +102,12 @@ public class Server extends WebSocketServer {
                 Room _room = roomList.get(roomList.indexOf(room));
                 Video video = new Video(videoUrl, videoThumb, videoDuration, videoName);
                 _room.addVideo(video);
-                webSocket.send("add_video:false:Vídeo adicionado com sucesso!:" + token + "");
+                webSocket.send("add_video:0:Vídeo adicionado com sucesso!:" + token);
                 sendMessageToAllUserOnRoom(_room,"Vídeo adicionado por " + name, "Sala", "add_video");
                 return ;
             }
 
-            webSocket.send("add_video:true:Sala inexistente!:" + token);
+            webSocket.send("add_video:1:Sala inexistente!:" + token);
         }
 
         if(m == Message.LIST_VIDEOS){
@@ -117,11 +117,11 @@ public class Server extends WebSocketServer {
 
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
-                webSocket.send("list_video:false:" + _room.getVideoQueueJson() + ":" + token);
+                webSocket.send("list_videos:0:" + _room.getVideoQueueJson() + ":" + token);
                 return ;
             }
 
-            webSocket.send("list_video:true:Sala inexistente!:" + token);
+            webSocket.send("list_videos:1:Sala inexistente!:" + token);
         }
 
         if(m == Message.GET_VIDEO){
@@ -131,10 +131,10 @@ public class Server extends WebSocketServer {
 
             if(roomList.contains(room)){
                 Room _room = roomList.get(roomList.indexOf(room));
-                webSocket.send("get_video:false:" + _room.nextVideo() + ":" + token);
+                webSocket.send("get_video:0:" + _room.nextVideo() + ":" + token);
                 return ;
             }
-            webSocket.send("get_video:true:Sala inexistente!:" + token);
+            webSocket.send("get_video:1:Sala inexistente!:" + token);
         }
 
         if(m == Message.SEND_MESSAGE){
@@ -153,7 +153,7 @@ public class Server extends WebSocketServer {
                 sendMessageToAllUserOnRoom(_room, message, user, "receive_message");
                 return ;
             }
-            webSocket.send("send_message:true:Sala inexistente!:" + token);
+            webSocket.send("send_message:1:Sala inexistente!:" + token);
         }
 
     }
@@ -175,7 +175,7 @@ public class Server extends WebSocketServer {
 
     private void sendMessageToAllUserOnRoom(Room room, String message, String sender, String type){
         room.getUserList().forEach(user -> {
-            user.getWebSocket().send("receive_message:false:" + message + ":" + sender + ":" + type + ":" + room.getUserList().size() + ":" + room.queueCount());
+            user.getWebSocket().send("receive_message:0:" + message + ":" + sender + ":" + type + ":" + room.getUserList().size() + ":" + room.queueCount());
         });
     }
 }

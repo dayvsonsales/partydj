@@ -42,7 +42,7 @@ public class Room implements Runnable {
     private void checkVideoRunning(User user){
         if(isRunningVideo){
             long startTimeMilis = System.currentTimeMillis() - startVideoTime + SYNC;
-            user.getWebSocket().send("get_video:false:" + videoRunning.getUrlId() + ":" + videoRunning.getThumbnail() + ":" + videoRunning.getVideoName() + ":" + startTimeMilis/1000);
+            user.getWebSocket().send("get_video:0:" + videoRunning.getUrlId() + ":" + videoRunning.getThumbnail() + ":" + videoRunning.getVideoName() + ":" + startTimeMilis/1000);
         }
     }
 
@@ -114,13 +114,13 @@ public class Room implements Runnable {
 
     private void sendVideoToEveryoneOnRoom(Video video){
         userList.forEach(user -> {
-            user.getWebSocket().send("get_video:false:" + video.getUrlId() + ":" + video.getThumbnail() + ":" + video.getVideoName());
+            user.getWebSocket().send("get_video:0:" + video.getUrlId() + ":" + video.getThumbnail() + ":" + video.getVideoName());
         });
     }
 
     private void sendNoVideoToEveryoneOnRoom(){
         userList.forEach(user -> {
-            user.getWebSocket().send("get_video:true");
+            user.getWebSocket().send("get_video:1");
         });
     }
 }

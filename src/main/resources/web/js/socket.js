@@ -3,7 +3,12 @@ var token;
 var nome;
 
 var criarSala = function () {
-    nome = $("#nome").val();
+    nome = escapeHtml($("#nome").val());
+
+    if(nome.includes(":")){
+        alert("Nome inválido!");
+        return ;
+    }
 
     if(!nome){
         alert("Necessário informar o nome!");
@@ -15,7 +20,7 @@ var criarSala = function () {
 };
 
 var entrarSala = function () {
-    nome = $("#nome").val();
+    nome = escapeHtml($("#nome").val());
     token = $("#token-sala").val();
 
     if(!nome){
@@ -40,30 +45,32 @@ socket.onerror = function (ev) {
 };
 
 socket.onmessage = function (ev) {
-    console.log(ev);
+
     let message = ev.data;
     let arr = message.split(":");
 
     let command = arr[0];
 
     if(command == "create_room"){
-        if(arr[1] == "false"){
+        if(arr[1] == "0"){
             token = arr[3];
             $("#secao-inicial").prop("style", "display: none");
             $("#secao-sala").prop("style", "display: ");
             $("#nome-dono").text($("#nome").val());
             $("#numero-token-sala").text(token);
+            socket.send(`list_videos:${token}`);
         }else{
             alert("Falha ao criar uma sala!");
         }
     }
 
     if(command == "enter_room"){
-        if(arr[1] == "false"){
+        if(arr[1] == "0"){
             $("#secao-inicial").prop("style", "display: none");
             $("#secao-sala").prop("style", "display: ");
             $("#nome-dono").text(arr[4]);
             $("#numero-token-sala").text(arr[3]);
+            socket.send(`list_videos:${token}`);
         }else{
             alert("Sala inexistente!");
         }
@@ -71,7 +78,7 @@ socket.onmessage = function (ev) {
 
     if(command == "receive_message"){
 
-        if(arr[1] == "false"){
+        if(arr[1] == "0"){
             $("#users-count").empty();
             $("#queue-count").empty();
 
@@ -88,16 +95,17 @@ socket.onmessage = function (ev) {
             }
 
             $("#users-count").append(_users_count);
-            $("#queue-count").append(`Há_${queue_count} vídeo(s) na fila!`);
+            $("#queue-count").append(`Há_${_queue_count} vídeo(s) na fila!`);
         }else{
             alert("Aconteceu um erro!");
         }
+        socket.send(`list_videos:${token}`);
     }
 
     if(command == "get_video"){
         $("#name-video").empty();
         $("#video").empty();
-        if(arr[1] == "true"){
+        if(arr[1] == "1"){
             $("#name-video").val("");
             $("#video").empty();
             $("#video").append("Ainda não temos vídeo para exibir :(");
@@ -117,16 +125,38 @@ socket.onmessage = function (ev) {
                 $("#video").append(`<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?controls=0&autoplay=1&disablekb=1&showinfo=0&fs=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`);
             }
         }
+        socket.send(`list_videos:${token}`);
+    }
+
+    if(command == "list_videos"){
+        if(arr[1] == "0"){
+            $("#carousel-items").empty();
+
+            message = message.replace(/list_videos:0:/,  "");
+            let re = new RegExp(":" + token, "g");
+            message = message.replace(re,  "");
+
+            console.log(message);
+
+            let jsonQueue = JSON.parse(message);
+
+            var i;
+            var l = jsonQueue.length;
+
+            for(i = 0; i < l; i++){
+                if(i == 0){
+                    $("#carousel-items").append(`<div class="carousel-item active"><img class="d-block" style="height: 100px; width: 30%;" src="https:${jsonQueue[i].thumbnail}" alt="${jsonQueue[i].videoName}"></div>`);
+                }else{
+                    $("#carousel-items").append(`<div class="carousel-item"><img class="d-block" style="height: 100px; width: 30%;" src="https:${jsonQueue[i].thumbnail}" alt="${jsonQueue[i].videoName}"></div>`);
+                }
+            }
+        }
     }
 
 };
 
 var pedirMusica = function (title, thumbnailUrl, videoId) {
     $.magnificPopup.close();
-
-    console.log(videoId);
-    console.log(thumbnailUrl);
-    console.log(title);
 
     $.ajax({
         url: "https://www.googleapis.com/youtube/v3/videos",
@@ -149,7 +179,7 @@ var pedirMusica = function (title, thumbnailUrl, videoId) {
 
 $("#enter").keyup(function (e){
         if(e.which == 13){
-            let message = $("#enter").val();
+            let message = escapeHtml($("#enter").val());
             socket.send(`send_message:${token}:${message}:${nome}`);
             $("#enter").val("");
         }
@@ -159,7 +189,7 @@ $("#video-search").keyup(function (e){
         if(e.which == 13){
             $("#list-video").empty();
             let q = $("#video-search").val();
-            console.log(q);
+
             $.ajax({
                 url: 'https://www.googleapis.com/youtube/v3/search',
                 type: 'GET',
@@ -173,10 +203,18 @@ $("#video-search").keyup(function (e){
             }).done(function (r) {
                 r.items.forEach((p, k) => {
                     let v = p.snippet;
-                    let videoId = p.id.videoId;
-                    var url = v.thumbnails.default.url;
+                    let videoId = escapeHtml(p.id.videoId);
+                    var url = escapeHtml(v.thumbnails.default.url);
                     url = url.replace(/https:/, "");
-                    $("#list-video").append(`<li class="list-group-item"><div class="row"><div class="col-md-4"><img src="${url}"/></div><div class="col-md-4">${v.title}</div><div class="col-md-4"><button class="btn btn-success" onclick="pedirMusica('${v.title}', '${url}', '${videoId}')">+</button></div></div></li>`);
+                    var title = v.title;
+                    title = title.replace(/'/, "");
+                    title = escapeHtml(title);
+
+                    console.log(title);
+                    console.log(url);
+                    console.log(videoId);
+
+                    $("#list-video").append(`<li class="list-group-item"><div class="row"><div class="col-md-4"><img src="${url}"/></div><div class="col-md-4">${v.title}</div><div class="col-md-4"><button class="btn btn-success" onclick="pedirMusica('${title}', '${url}', '${videoId}')">+</button></div></div></li>`);
                 });
             });
         }
@@ -192,3 +230,21 @@ $(".open-popup").magnificPopup({
         }
     }
 });
+
+
+var entityMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
+};
+
+function escapeHtml (string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+        return entityMap[s];
+    });
+}

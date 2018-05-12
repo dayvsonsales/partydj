@@ -9,7 +9,6 @@ public enum Message {
     ADD_VIDEO,
     LIST_VIDEOS,
     GET_VIDEO,
-    SERVER_DIED,
     UNKNOW
 
 }
