@@ -48,29 +48,29 @@ Onde,
 
 1. Para o cliente. 
 
-  **ENTER_ROOM**: deve ser passado o nome do cliente e o token da sala
+  * **ENTER_ROOM**: deve ser passado o nome do cliente e o token da sala
   
   `enter_room:<nome>:<token>`
   
-  **CREATE_ROOM**: deve ser passado o nome do cliente, o servidor enviará um retorno com o token gerado e redicionará o cliente para a sala.
+  * **CREATE_ROOM**: deve ser passado o nome do cliente, o servidor enviará um retorno com o token gerado e redicionará o cliente para a sala.
   
   `create_room:<nome>`
   
-  **SEND_MESSAGE**: será passado a mensagem, o nome do cliente, o token da sala
+  * **SEND_MESSAGE**: será passado a mensagem, o nome do cliente, o token da sala
   
   `send_message:<token>:<mensagem>:<nome>`
   
-  **RECEIVE_MESSAGE**: esta ação é exclusiva para envio por parte do servidor, onde o cliente irá tratá-la.
+  * **RECEIVE_MESSAGE**: esta ação é exclusiva para envio por parte do servidor, onde o cliente irá tratá-la.
   
-  **ADD_VIDEO**: deve ser passado o token da sala, o nome do cliente, o id do vídeo, o thumbnail dele, a duração e seu título.
+  * **ADD_VIDEO**: deve ser passado o token da sala, o nome do cliente, o id do vídeo, o thumbnail dele, a duração e seu título.
   
   `add_video:<token>:<nome>:<videoId>:<videoThumb>:<videoDuracao>:<videoNome>`
   
-  **LIST_VIDEOS**: deve ser passado o token da sala, será retornado a lista dos 5 primeiros vídeos na fila (se houver).  
+  * **LIST_VIDEOS**: deve ser passado o token da sala, será retornado a lista dos 5 primeiros vídeos na fila (se houver).  
   
   `list_video:<token>`
   
-  **GET_VIDEO**: aqui será tratado o vídeo que irá ser exibido. O servidor cuida do envio desta mensagem.  
+  * **GET_VIDEO**: aqui será tratado o vídeo que irá ser exibido. O servidor cuida do envio desta mensagem.  
   
 2. Para o servidor.  
 
