@@ -87,7 +87,7 @@ Onde,
   
  * **SEND_MESSAGE:** o servidor recebe este parâmetro e faz um broadcast para todos os usuários na sala, a mensagem a ser enviada para o cliente é uma receive_message.  
   
- * ** RECEIVE_MESSAGE: ** esta ação é exclusiva para envio por parte do servidor, onde o cliente irá tratá-la.
+ * **RECEIVE_MESSAGE:** esta ação é exclusiva para envio por parte do servidor, onde o cliente irá tratá-la.
   
   `receive_message:<erro>:<mensagem>:<quem enviou>:<tipo>:<tamanho de usuarios na sala>:<contagem de videos na fila>`
   
