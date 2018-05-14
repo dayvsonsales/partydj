@@ -48,58 +48,58 @@ Onde,
 
 1. Para o cliente. 
 
-  ENTER_ROOM: deve ser passado o nome do cliente e o token da sala
+  **ENTER_ROOM**: deve ser passado o nome do cliente e o token da sala
   
   `enter_room:<nome>:<token>`
   
-  CREATE_ROOM: deve ser passado o nome do cliente, o servidor enviará um retorno com o token gerado e redicionará o cliente para a sala.
+  **CREATE_ROOM**: deve ser passado o nome do cliente, o servidor enviará um retorno com o token gerado e redicionará o cliente para a sala.
   
   `create_room:<nome>`
   
-  SEND_MESSAGE: será passado a mensagem, o nome do cliente, o token da sala
+  **SEND_MESSAGE**: será passado a mensagem, o nome do cliente, o token da sala
   
   `send_message:<token>:<mensagem>:<nome>`
   
-  RECEIVE_MESSAGE: esta ação é exclusiva para envio por parte do servidor, onde o cliente irá tratá-la.
+  **RECEIVE_MESSAGE**: esta ação é exclusiva para envio por parte do servidor, onde o cliente irá tratá-la.
   
-  ADD_VIDEO: deve ser passado o token da sala, o nome do cliente, o id do vídeo, o thumbnail dele, a duração e seu título.
+  **ADD_VIDEO**: deve ser passado o token da sala, o nome do cliente, o id do vídeo, o thumbnail dele, a duração e seu título.
   
   `add_video:<token>:<nome>:<videoId>:<videoThumb>:<videoDuracao>:<videoNome>`
   
-  LIST_VIDEOS: deve ser passado o token da sala, será retornado a lista dos 5 primeiros vídeos na fila (se houver).  
+  **LIST_VIDEOS**: deve ser passado o token da sala, será retornado a lista dos 5 primeiros vídeos na fila (se houver).  
   
   `list_video:<token>`
   
-  GET_VIDEO: aqui será tratado o vídeo que irá ser exibido. O servidor cuida do envio desta mensagem.  
+  **GET_VIDEO**: aqui será tratado o vídeo que irá ser exibido. O servidor cuida do envio desta mensagem.  
   
 2. Para o servidor.  
 
- * ** ENTER_ROOM: ** quando recebido esta mensagem do cliente, o servidor verifica se o token é válido e qual sala o pertence, então adiciona o usuário a sala correspondente, se houver, e verifica se há vídeo sendo exibido, para manter uma sincronia e usuário não ficar esperando pelo próximo vídeo a ser exibido.  
+ * **ENTER_ROOM:** quando recebido esta mensagem do cliente, o servidor verifica se o token é válido e qual sala o pertence, então adiciona o usuário a sala correspondente, se houver, e verifica se há vídeo sendo exibido, para manter uma sincronia e usuário não ficar esperando pelo próximo vídeo a ser exibido.  
   É retornado ao cliente,
   
   `enter_room:<erro>:<mensagem>:<token>`
   
   que o redireciona para a sala.
   
- * ** CREATE_ROOM: ** o servidor enviará um retorno com o token gerado e redicionará o cliente para a sala. Internamente, uma sala é criada, uma nova thread é iniciada, para organizar a fila de vídeos a serem exibidos.  
+ * **CREATE_ROOM:** o servidor enviará um retorno com o token gerado e redicionará o cliente para a sala. Internamente, uma sala é criada, uma nova thread é iniciada, para organizar a fila de vídeos a serem exibidos.  
   
   `create_room:<erro>:<mensagem>:<token>`
   
- * ** SEND_MESSAGE: ** o servidor recebe este parâmetro e faz um broadcast para todos os usuários na sala, a mensagem a ser enviada para o cliente é uma receive_message.  
+ * **SEND_MESSAGE:** o servidor recebe este parâmetro e faz um broadcast para todos os usuários na sala, a mensagem a ser enviada para o cliente é uma receive_message.  
   
  * ** RECEIVE_MESSAGE: ** esta ação é exclusiva para envio por parte do servidor, onde o cliente irá tratá-la.
   
   `receive_message:<erro>:<mensagem>:<quem enviou>:<tipo>:<tamanho de usuarios na sala>:<contagem de videos na fila>`
   
- * ** ADD_VIDEO: ** o servidor recebe a mensagem do cliente e envia uma confirmação. Uma receive_message também é enviada, para comunicar a todos a inserção do vídeo. Internamente, adiciona o vídeo a fila.  
+ * **ADD_VIDEO:** o servidor recebe a mensagem do cliente e envia uma confirmação. Uma receive_message também é enviada, para comunicar a todos a inserção do vídeo. Internamente, adiciona o vídeo a fila.  
   
   `add_video:<erro>:<mensagem>:<token>`
   
- * ** LIST_VIDEOS: ** o servidor retorna um json com as informações dos vídeos que estão na fila 
+ * **LIST_VIDEOS:** o servidor retorna um json com as informações dos vídeos que estão na fila 
   
   `list_video:<erro>:<json ou mensagem de erro>:<token>`
   
- * ** GET_VIDEO: ** envia o vídeo a ser exibido nos clientes
+ * **GET_VIDEO:** envia o vídeo a ser exibido nos clientes
   
   `get_video:<erro>:<videoId>:<videoThumb>:<videoNome>`
   
