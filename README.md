@@ -1,7 +1,22 @@
 # Projeto de redes 1: Party.dj
 
-Party.dj é uma aplicação baseada no plug.dj, a qual consiste em compartilhar e descobrir músicas entre amigos.  
-Utilizando a API do YouTube, é possível criar uma sala, convidar seus amigos passando-os o token desta sala e usufruir de uma experiência de compartilhamento de vídeos, em especial músicas.  
+Party.dj é uma aplicação baseada no plug.dj, a qual consiste em compartilhar e descobrir vídeos entre amigos.  
+Utilizando a API do YouTube, é possível criar uma sala, convidar seus amigos passando-os o token desta sala e usufruir de uma experiência de compartilhamento de vídeos, em especial músicas.
+
+O projeto foi estruturado com base no paradigma de orientação a objetos, mapeando o sistema em classes: Server, Room, Video, Protocol, User. 
+
+A classe Server é a responsável por gerenciar toda parte da lógica, desde a primeira conexão até o encerramento, tomando como auxilio a classe Protocol, onde processa as mensagens que chegam e passam ao servidor. A partir da mensagem, o servidor escolhe as ações a serem tomadas, como por exemplo, criar uma sala.  
+
+Para tentar garantir a mesma experiência para todos, a classe Room possui uma Thread que monitora o vídeo em execução e sincroniza aos usuários que chegam na sala (mesmo se ele já estiver começado). 
+
+## Como rodar
+
+Este é um projeto Maven. O maven cuidará de importar as dependência necessárias e configurar o ambiente para o Java 8.  
+Deve ser executada a classe App.java, onde iniciará um servidor na porta 4000 para a web (http://localhost:4000) e um servidor na porta 8000 (http://localhost:8000) para o socket.  
+
+O projeto foi desenvolvido na IDE IDEA Ultimate.  
+
+Obs.: caso após executar e encerrar e depois executar novamente poderá haver um erro (as vezes o garbage collector não foi executado ainda e a porta ainda não está livre).  
 
 ## Funcionalidades
 
@@ -10,6 +25,7 @@ Utilizando a API do YouTube, é possível criar uma sala, convidar seus amigos p
 3. Enviar Mensagem. 
 4. Adicionar vídeo a fila da sala. 
 5. Sincronizar os vídeos sendo exibidos entre os participantes daquela sala. 
+6. Ver os vídeos na fila.      
 
 ## Principais dificuldades encontradas
 
@@ -25,7 +41,7 @@ Foi definido um protocolo baseado em mensagens com o seguinte formato:
 
 `<ação> : <erro> : <parametros>`  
 
-Onde será recebida pelo cliente e receberá o tratamento específico, o parâmetro erro é um booleano, indicando se houve erro ou não.  
+Onde será recebida pelo cliente e receberá o tratamento específico, o parâmetro erro é um booleano (0 ou 1), indicando se houve erro ou não.  
 
 2. Mensagens enviadas pelo cliente  
 
@@ -97,9 +113,12 @@ Onde,
   
  * **LIST_VIDEOS:** o servidor retorna um json com as informações dos vídeos que estão na fila 
   
-  `list_video:<erro>:<json ou mensagem de erro>:<token>`
+  `list_video:<erro>:<json em formato de texto ou mensagem de erro>:<token>`
   
  * **GET_VIDEO:** envia o vídeo a ser exibido nos clientes
   
   `get_video:<erro>:<videoId>:<videoThumb>:<videoNome>`
-  
+ 
+ ## O que poderia ter sido feito a mais
+ 
+Poderia ter melhorado a experiência do usuário e ter adicionado mais mensagens no protocolo, principalmente no tocante à administração da sala (poder passar vídeos, gostei ou não gostei, etc).  
