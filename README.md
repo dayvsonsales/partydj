@@ -49,6 +49,10 @@ Onde será recebida pelo cliente e receberá o tratamento específico, o parâme
 
 Onde será recebida pelo cliente e receberá o tratamento específico.
 
+Em ambos casos, o separador será sempre `:` para os parâmetros.  
+
+Nesta primeira implementação, está vedada a utilização de mensagens ou nome que contenham o caracter `:` em seu conteúdo, sendo assim, é um caracter reservado ao protocolo.  
+
 ## Ações
 
     ENTER_ROOM,  -> Entrar em uma sala
@@ -121,4 +125,4 @@ Onde,
  
  ## O que poderia ter sido feito a mais
  
-Poderia ter melhorado a experiência do usuário e ter adicionado mais mensagens no protocolo, principalmente no tocante à administração da sala (poder passar vídeos, gostei ou não gostei, etc).  
+Poderia ter melhorado a experiência do usuário e ter adicionado mais mensagens no protocolo, principalmente no tocante à administração da sala (poder passar vídeos, gostei ou não gostei, etc). Poderia ter sido adicionado tratamento ao `:` quando o mesmo fosse conteúdo da mensagem passada ao servidor.
