@@ -127,3 +127,8 @@ Onde,
  ## O que poderia ter sido feito a mais
  
 Poderia ter melhorado a experiência do usuário e ter adicionado mais mensagens no protocolo, principalmente no tocante à administração da sala (poder passar vídeos, gostei ou não gostei, etc). Poderia ter sido adicionado tratamento ao `:` quando o mesmo fosse conteúdo da mensagem passada ao servidor.
+
+
+## Protocolo usado na camada de transporte
+
+Como foi utilizado uma implementação padrão do websocket, é utilizad o TCP na camada de transporte.  
