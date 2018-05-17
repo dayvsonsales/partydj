@@ -11,7 +11,8 @@ Para tentar garantir a mesma experiência para todos, a classe Room possui uma T
 
 ## Como rodar
 
-Este é um projeto Maven. O maven cuidará de importar as dependência necessárias e configurar o ambiente para o Java 8.  
+Este é um projeto Maven. O maven cuidará de importar as dependência necessárias e configurar o ambiente para o Java 8. 
+As dependências são Spark (para servir a aplicação) e WebSocket (para o websocket).  
 Deve ser executada a classe App.java, onde iniciará um servidor na porta 4000 para a web (http://localhost:4000) e um servidor na porta 8000 (http://localhost:8000) para o socket.  
 
 O projeto foi desenvolvido na IDE IDEA Ultimate.  
