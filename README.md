@@ -11,7 +11,8 @@ Para tentar garantir a mesma experiência para todos, a classe Room possui uma T
 
 ## Como rodar
 
-Este é um projeto Maven. O maven cuidará de importar as dependência necessárias e configurar o ambiente para o Java 8.  
+Este é um projeto Maven. O maven cuidará de importar as dependência necessárias e configurar o ambiente para o Java 8. 
+As dependências são Spark (para servir a aplicação) e WebSocket (para o websocket).  
 Deve ser executada a classe App.java, onde iniciará um servidor na porta 4000 para a web (http://localhost:4000) e um servidor na porta 8000 (http://localhost:8000) para o socket.  
 
 O projeto foi desenvolvido na IDE IDEA Ultimate.  
@@ -126,3 +127,8 @@ Onde,
  ## O que poderia ter sido feito a mais
  
 Poderia ter melhorado a experiência do usuário e ter adicionado mais mensagens no protocolo, principalmente no tocante à administração da sala (poder passar vídeos, gostei ou não gostei, etc). Poderia ter sido adicionado tratamento ao `:` quando o mesmo fosse conteúdo da mensagem passada ao servidor.
+
+
+## Protocolo usado na camada de transporte
+
+Como foi utilizado uma implementação padrão do websocket, é utilizad o TCP na camada de transporte.  
