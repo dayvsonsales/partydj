@@ -102,7 +102,7 @@ public class Server extends WebSocketServer {
                 Room _room = roomList.get(roomList.indexOf(room));
                 Video video = new Video(videoUrl, videoThumb, videoDuration, videoName);
                 _room.addVideo(video);
-                webSocket.send("add_video:0:Vídeo adicionado com sucesso!:" + token);
+                webSocket.send("add_video:0:Novo vídeo adicionado com sucesso!:" + token);
                 sendMessageToAllUserOnRoom(_room,"Vídeo adicionado por " + name, "Sala", "add_video");
                 return ;
             }
@@ -160,7 +160,7 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-
+        System.out.println("Excecão: " + e.getMessage());
     }
 
     @Override

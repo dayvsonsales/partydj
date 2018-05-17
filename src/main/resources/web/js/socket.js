@@ -180,6 +180,7 @@ var pedirMusica = function (title, thumbnailUrl, videoId) {
 $("#enter").keyup(function (e){
         if(e.which == 13){
             let message = escapeHtml($("#enter").val());
+            message = message.replace(/:/g, "");
             socket.send(`send_message:${token}:${message}:${nome}`);
             $("#enter").val("");
         }
@@ -230,7 +231,6 @@ $(".open-popup").magnificPopup({
         }
     }
 });
-
 
 var entityMap = {
     '&': '&amp;',
