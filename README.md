@@ -9,6 +9,8 @@ A classe Server é a responsável por gerenciar toda parte da lógica, desde a p
 
 Para tentar garantir a mesma experiência para todos, a classe Room possui uma Thread que monitora o vídeo em execução e sincroniza aos usuários que chegam na sala (mesmo se ele já estiver começado). 
 
+A classe User e Video são classes de modelo, servindo apenas para auxiliar as outras classes.  
+
 ## Como rodar
 
 Este é um projeto Maven. O maven cuidará de importar as dependência necessárias e configurar o ambiente para o Java 8. 
@@ -48,7 +50,7 @@ Onde será recebida pelo cliente e receberá o tratamento específico, o parâme
 
 `<ação> : <parametros> ` 
 
-Onde será recebida pelo cliente e receberá o tratamento específico.
+Onde será recebida pelo servidor e receberá o tratamento específico.
 
 Em ambos casos, o separador será sempre `:` para os parâmetros.  
 
@@ -67,7 +69,7 @@ Nesta primeira implementação, está vedada a utilização de mensagens ou nome
    
 Onde, 
 
-1. Para o cliente. 
+1. Para o cliente:  
 
   * **ENTER_ROOM**: deve ser passado o nome do cliente e o token da sala
   
@@ -93,7 +95,7 @@ Onde,
   
   * **GET_VIDEO**: aqui será tratado o vídeo que irá ser exibido. O servidor cuida do envio desta mensagem.  
   
-2. Para o servidor.  
+2. Para o servidor:   
 
  * **ENTER_ROOM:** quando recebido esta mensagem do cliente, o servidor verifica se o token é válido e qual sala o pertence, então adiciona o usuário a sala correspondente, se houver, e verifica se há vídeo sendo exibido, para manter uma sincronia e usuário não ficar esperando pelo próximo vídeo a ser exibido.  
   É retornado ao cliente,
@@ -131,4 +133,4 @@ Poderia ter melhorado a experiência do usuário e ter adicionado mais mensagens
 
 ## Protocolo usado na camada de transporte
 
-Como foi utilizado uma implementação padrão do websocket, é utilizad o TCP na camada de transporte.  
+Como foi utilizado uma implementação padrão do websocket, é utilizado o TCP na camada de transporte.  
