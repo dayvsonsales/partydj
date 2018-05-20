@@ -1,6 +1,7 @@
 package mobi.dayvson.redes.partydj;
 
 import mobi.dayvson.redes.partydj.enums.Message;
+import mobi.dayvson.redes.partydj.interfaces.IRoom;
 import mobi.dayvson.redes.partydj.models.Protocol;
 import mobi.dayvson.redes.partydj.models.Room;
 import mobi.dayvson.redes.partydj.models.User;
@@ -8,6 +9,8 @@ import mobi.dayvson.redes.partydj.models.Video;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -17,29 +20,28 @@ import java.util.stream.Collectors;
 
 public class Server extends WebSocketServer {
 
-    private List<Room> roomList;
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
+    private List<IRoom> roomList;
 
     private List<User> guests;
 
-    public Server(InetSocketAddress address){
+    public Server(InetSocketAddress address, List<IRoom> roomList, List<User> guests){
         super(address);
-        this.roomList = new ArrayList<>();
-        this.guests = new ArrayList<>();
+        this.roomList = roomList;
+        this.guests = guests;
     }
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-        System.out.println("Um usuário anônimo se conectou!");
         guests.add(new User(UUID.randomUUID(), "guest", webSocket));
     }
 
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-        System.out.println("Um usuário saiu do servidor!");
-        List<Room> rooms = roomList.stream().filter(room -> (room.getUserList().stream().filter(p -> p.getWebSocket().equals(webSocket)).collect(Collectors.toList()).size() > 0)).collect(Collectors.toList());
+        List<IRoom> rooms = roomList.stream().filter(room -> (room.getUserList().stream().filter(p -> p.getWebSocket().equals(webSocket)).collect(Collectors.toList()).size() > 0)).collect(Collectors.toList());
         rooms.forEach(r -> {
             User user = r.getUserList().stream().filter(u -> u.getWebSocket().equals(webSocket)).findFirst().get();
-            System.out.println("foi o " + user.getName());
             r.getUserList().removeIf(u -> u.getWebSocket().equals(webSocket));
             sendMessageToAllUserOnRoom(r, user.getName() + " se desconectou", "Sala", "send_message");
         });
@@ -48,11 +50,11 @@ public class Server extends WebSocketServer {
     @Override
     public void onMessage(WebSocket webSocket, String s) {
         Message m = Protocol.proccess(s);
-        System.out.println(roomList);
 
         if(m == Message.CREATE_ROOM){
             User user = new User(UUID.randomUUID(), s.split(":")[1], webSocket);
             String token = generateRoomToken();
+
             while(roomList.contains(new Room(token))){
                 token = generateRoomToken();
             }
@@ -63,6 +65,7 @@ public class Server extends WebSocketServer {
             new Thread(room).start();
 
             roomList.add(room);
+
             webSocket.send("create_room:0:Sucesso ao criar a sala!:" + token);
         }
 
@@ -71,13 +74,16 @@ public class Server extends WebSocketServer {
             String token = contents[1];
             String name = contents[2];
 
-            Room room = new Room(token);
+            IRoom room = new Room(token);
 
             if(roomList.contains(room)){
-                Room _room = roomList.get(roomList.indexOf(room));
+                IRoom _room = roomList.get(roomList.indexOf(room));
                 _room.addUser(new User(UUID.randomUUID(), name, webSocket));
+
                 webSocket.send("enter_room:0:Conectado com sucesso!:" + token + ":" + _room.getUserList().get(0).getName());
+
                 sendMessageToAllUserOnRoom(_room, name + " se conectou", "Sala", "enter_room");
+
                 return ;
             }
 
@@ -93,16 +99,18 @@ public class Server extends WebSocketServer {
             String videoDuration = contents[5];
             String videoName = contents[6];
 
-            System.out.println(name + "" + videoDuration + "" + videoUrl + "" + videoThumb);
+            logger.debug(name + "" + videoDuration + "" + videoUrl + "" + videoThumb);
 
             Room room = new Room(token);
-            System.out.println(token);
 
             if(roomList.contains(room)){
-                Room _room = roomList.get(roomList.indexOf(room));
+                IRoom _room = roomList.get(roomList.indexOf(room));
                 Video video = new Video(videoUrl, videoThumb, videoDuration, videoName);
+
                 _room.addVideo(video);
+
                 webSocket.send("add_video:0:Novo vídeo adicionado com sucesso!:" + token);
+
                 sendMessageToAllUserOnRoom(_room,"Vídeo adicionado por " + name, "Sala", "add_video");
                 return ;
             }
@@ -113,10 +121,12 @@ public class Server extends WebSocketServer {
         if(m == Message.LIST_VIDEOS){
             String[] contents =  s.split(":");
             String token = contents[1];
+
             Room room = new Room(token);
 
             if(roomList.contains(room)){
-                Room _room = roomList.get(roomList.indexOf(room));
+                IRoom _room = roomList.get(roomList.indexOf(room));
+
                 webSocket.send("list_videos:0:" + _room.getVideoQueueJson() + ":" + token);
                 return ;
             }
@@ -127,13 +137,16 @@ public class Server extends WebSocketServer {
         if(m == Message.GET_VIDEO){
             String[] contents =  s.split(":");
             String token = contents[1];
+
             Room room = new Room(token);
 
             if(roomList.contains(room)){
-                Room _room = roomList.get(roomList.indexOf(room));
+                IRoom _room = roomList.get(roomList.indexOf(room));
+
                 webSocket.send("get_video:0:" + _room.nextVideo() + ":" + token);
                 return ;
             }
+
             webSocket.send("get_video:1:Sala inexistente!:" + token);
         }
 
@@ -143,16 +156,17 @@ public class Server extends WebSocketServer {
             String message = contents[2];
             String user = contents[3];
 
-            System.out.println(token + message + user);
+            logger.debug(token + message + user);
 
             Room room = new Room(token);
 
             if(roomList.contains(room)){
-                Room _room = roomList.get(roomList.indexOf(room));
-                System.out.println(_room);
+                IRoom _room = roomList.get(roomList.indexOf(room));
+
                 sendMessageToAllUserOnRoom(_room, message, user, "receive_message");
                 return ;
             }
+
             webSocket.send("send_message:1:Sala inexistente!:" + token);
         }
 
@@ -160,12 +174,12 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-        System.out.println("Excecão: " + e.getMessage());
+        logger.error("Erro ao criar a conexão socket", e.getMessage());
     }
 
     @Override
     public void onStart() {
-        System.out.println("Servidor iniciado com sucesso!");
+        logger.debug("Servidor iniciado com sucesso!");
     }
 
     private String generateRoomToken(){
@@ -173,7 +187,7 @@ public class Server extends WebSocketServer {
         return String.valueOf(uuid).substring(0, 6);
     }
 
-    private void sendMessageToAllUserOnRoom(Room room, String message, String sender, String type){
+    private void sendMessageToAllUserOnRoom(IRoom room, String message, String sender, String type){
         room.getUserList().forEach(user -> {
             user.getWebSocket().send("receive_message:0:" + message + ":" + sender + ":" + type + ":" + room.getUserList().size() + ":" + room.queueCount());
         });

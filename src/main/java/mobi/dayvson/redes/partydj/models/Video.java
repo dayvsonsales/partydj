@@ -3,6 +3,7 @@ package mobi.dayvson.redes.partydj.models;
 import com.google.gson.Gson;
 
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 public class Video {
@@ -15,8 +16,12 @@ public class Video {
     public Video(String urlId, String thumbnail, String duration, String videoName) {
         this.urlId = urlId;
         this.thumbnail = thumbnail;
-        this.durationMilliseconds = Duration.parse(duration).toMillis();
+        this.durationMilliseconds = convertDuration(duration);
         this.videoName = videoName;
+    }
+
+    private long convertDuration(String duration) throws DateTimeParseException{
+        return Duration.parse(duration).toMillis();
     }
 
     public long getDurationMilliseconds() {
@@ -46,7 +51,6 @@ public class Video {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(urlId, thumbnail);
     }
 

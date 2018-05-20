@@ -1,14 +1,19 @@
 package mobi.dayvson.redes.partydj.models;
 
 import com.google.gson.Gson;
+import mobi.dayvson.redes.partydj.interfaces.IRoom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
 
-public class Room implements Runnable {
+public class Room implements Runnable, IRoom {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private List<User> userList;
-    private final String roomToken;
+    public final String roomToken;
     private Queue<Video> videoQueue;
 
     private volatile int state;
@@ -36,6 +41,8 @@ public class Room implements Runnable {
         if(user != null) {
             this.userList.add(user);
             this.checkVideoRunning(user);
+        }else{
+            throw new IllegalArgumentException("Usuario não pode ser vazio");
         }
     }
 
@@ -55,7 +62,7 @@ public class Room implements Runnable {
         videoQueue.add(video);
     }
 
-    public void stopRoom(){
+    private void stopRoom(){
         this.state = 1;
     }
 
@@ -72,7 +79,15 @@ public class Room implements Runnable {
     }
 
     public String toString(){
-        return this.roomToken + " " + userList.size() + " " + videoQueue.size();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(this.roomToken);
+        sb.append(" ");
+        sb.append(userList.size());
+        sb.append(" ");
+        sb.append(videoQueue.size());
+
+        return sb.toString();
     }
 
     @Override
@@ -94,14 +109,17 @@ public class Room implements Runnable {
         while(state != STOP){
             if(!videoQueue.isEmpty()){
                 times = 0;
-                videoRunning = videoQueue.remove();
+
+                this.videoRunning = videoQueue.remove();
                 this.isRunningVideo = true;
                 this.sendVideoToEveryoneOnRoom(videoRunning);
                 this.startVideoTime = System.currentTimeMillis();
+
                 try {
                     Thread.sleep(videoRunning.getDurationMilliseconds() + SYNC + 3 );
                 } catch (InterruptedException e) {
                     this.stopRoom();
+                    logger.error("Aconteceu um erro na thread da sala: " + roomToken, e.getMessage());
                 }
             }else  {
                 if(times == 0){
@@ -112,13 +130,15 @@ public class Room implements Runnable {
         }
     }
 
-    private void sendVideoToEveryoneOnRoom(Video video){
+    @Override
+    public void sendVideoToEveryoneOnRoom(Video video){
         userList.forEach(user -> {
             user.getWebSocket().send("get_video:0:" + video.getUrlId() + ":" + video.getThumbnail() + ":" + video.getVideoName());
         });
     }
 
-    private void sendNoVideoToEveryoneOnRoom(){
+    @Override
+    public void sendNoVideoToEveryoneOnRoom(){
         userList.forEach(user -> {
             user.getWebSocket().send("get_video:1");
         });

@@ -5,6 +5,8 @@ import spark.Spark;
 import spark.utils.IOUtils;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+
 import static spark.Spark.*;
 public class App {
 
@@ -25,7 +27,7 @@ public class App {
     private static void startServerSocket(){
         String host = "localhost";
         Integer port = 8000;
-        Server server = new Server(new InetSocketAddress(host, port));
+        Server server = new Server(new InetSocketAddress(host, port), new ArrayList<>(), new ArrayList<>());
 
         server.run();
     }
