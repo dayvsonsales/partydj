@@ -46,5 +46,14 @@ public class UserTest {
         assertFalse(user2.equals(user));
     }
 
+    @Test
+    void toStringNome(){
+        assertEquals("Dayvson", user.toString());
+    }
+
+    @Test
+    void hashCodeTeste(){
+        assertEquals("2017169385", user.hashCode());
+    }
 
 }

@@ -64,4 +64,9 @@ public class ProtocolTest {
         assertEquals(Message.UNKNOW, Protocol.proccess(msg));
     }
 
+    @Test
+    void convert(){
+        assertEquals("enter_room", Protocol.convert(Message.ENTER_ROOM));
+    }
+
 }

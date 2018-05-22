@@ -2,7 +2,10 @@ package integracao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import mobi.dayvson.redes.partydj.App;
+import org.junit.Before;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -19,6 +22,7 @@ public class IntegracaoTest {
     private static final String URL_BASE = "http://localhost:4000";
 
     private WebDriver webDriver;
+
 
     @BeforeEach
     void setUp(){

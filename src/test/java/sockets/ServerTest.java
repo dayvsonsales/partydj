@@ -148,6 +148,77 @@ public class ServerTest {
     }
 
     @Test
+    void onMessageEnterRoomThatRoomDoesntExist(){
+        WebSocketMock webSocketMockMaria = new WebSocketMock();
+
+        server.onMessage(webSocketMockMaria, "enter_room:789:Maria");
+
+        assertAll(() -> {
+            assertTrue(webSocketMockMaria.hasBufferedData());
+            assertFalse(webSocketMock.hasBufferedData());
+        });
+    }
+
+    @Test
+    void onMessageAddVideoThatRoomDoesntExist() throws NoSuchFieldException, IllegalAccessException {
+
+        server.onMessage(webSocketMock, "add_video:789:Dayvson:youtube.com:you.com:PT20M1S:Teste");
+
+        Field roomList = Server.class.getDeclaredField("roomList");
+        roomList.setAccessible(true);
+
+        List<IRoom> roomList1 = (List<IRoom>) roomList.get(server);
+
+        IRoom room = roomList1.get(roomList1.indexOf(roomMock));
+
+        Video video = new Video("youtube.com", "you.com", "PT20M1S", "Teste");
+
+        assertAll(() -> {
+            assertTrue(webSocketMock.hasBufferedData());
+            assertEquals(null, room.nextVideo());
+        });
+    }
+
+    @Test
+    void onMessageListVideosThatRoomDoesntExist(){
+        server.onMessage(webSocketMock, "list_videos:789");
+
+        assertAll(() -> {
+            assertTrue(webSocketMock.hasBufferedData());
+        });
+    }
+
+    @Test
+    void onMessageGetVideoThatRoomDoesntExist() throws NoSuchFieldException, IllegalAccessException {
+        server.onMessage(webSocketMock, "add_video:789:Dayvson:youtube.com:you.com:PT20M1S:Teste");
+
+        Field roomList = Server.class.getDeclaredField("roomList");
+        roomList.setAccessible(true);
+
+        List<IRoom> roomList1 = (List<IRoom>) roomList.get(server);
+
+        IRoom room = roomList1.get(roomList1.indexOf(roomMock));
+
+        Video video = new Video("youtube.com", "you.com", "PT20M1S", "Teste");
+
+
+        server.onMessage(webSocketMock, "get_video:787");
+
+        assertAll(() -> {
+            assertTrue(webSocketMock.hasBufferedData());
+        });
+    }
+
+    @Test
+    void onMessageSendMessageThatRoomDoesntExist(){
+        server.onMessage(webSocketMock, "send_message:897:Testando:Dayvson");
+
+        assertAll(() -> {
+            assertTrue(webSocketMock.hasBufferedData());
+        });
+    }
+
+    @Test
     void generateRoomToken() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method generate = Server.class.getDeclaredMethod("generateRoomToken");
         generate.setAccessible(true);

@@ -66,4 +66,14 @@ public class VideoTest {
         }
     }
 
+    @Test
+    void toStringJsonTest(){
+        assertEquals("{\"urlId\":\"youtube.com\",\"thumbnail\":\"thumbnail.youtube.com\",\"videoName\":\"Teste\",\"durationMilliseconds\":1201000}", video.toString());
+    }
+
+    @Test
+    void hashCodeTest(){
+        assertEquals("1781895295", video.hashCode());
+    }
+
 }

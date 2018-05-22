@@ -111,7 +111,6 @@ public class RoomTest {
             assertTrue(user2.getWebSocket().hasBufferedData());
             assertFalse(user3NotInRoom.getWebSocket().hasBufferedData());
         });
-
     }
 
     @Test
@@ -132,7 +131,6 @@ public class RoomTest {
             assertTrue(user2.getWebSocket().hasBufferedData());
             assertFalse(user3NotInRoom.getWebSocket().hasBufferedData());
         });
-
     }
 
     @Test
@@ -184,7 +182,6 @@ public class RoomTest {
 
         User user3NotInRoom = new User(null, "Malbec", new WebSocketMock());
 
-
         Video video = new Video("", "", "PT20M1S", "");
         room.addVideo(video);
 
@@ -194,7 +191,6 @@ public class RoomTest {
         state.set(room, 0);
 
         assertThrows(InterruptedException.class, () -> room.run());
-
     }
 
 }

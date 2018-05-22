@@ -67,7 +67,9 @@ public class Room implements Runnable, IRoom {
     }
 
     public Video nextVideo(){
-        return videoQueue.remove();
+        if(videoQueue.size() > 0)
+            return videoQueue.remove();
+        return null;
     }
 
     public String getVideoQueueJson(){
