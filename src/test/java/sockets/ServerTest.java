@@ -5,7 +5,6 @@ import mobi.dayvson.redes.partydj.interfaces.IRoom;
 import mobi.dayvson.redes.partydj.models.Room;
 import mobi.dayvson.redes.partydj.models.User;
 import mobi.dayvson.redes.partydj.models.Video;
-import mocks.RoomMock;
 import mocks.WebSocketMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +13,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.*;
-
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerTest {
@@ -30,7 +25,7 @@ public class ServerTest {
     private Server server;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         this.webSocketMock = new WebSocketMock();
         this.roomMock = new Room("987");
         roomMock.addUser(new User(null, "Dayvson", webSocketMock));
@@ -53,7 +48,7 @@ public class ServerTest {
     }
 
     @Test
-    void onClose(){
+    void onClose() {
         WebSocketMock webSocketMockDaMaria = new WebSocketMock();
         roomMock.addUser(new User(null, "Maria", webSocketMockDaMaria));
         server.onClose(webSocketMock, 0, "", true);
@@ -77,14 +72,22 @@ public class ServerTest {
     }
 
     @Test
-    void onMessageEnterRoom(){
+    void onMessageEnterRoom() throws NoSuchFieldException, IllegalAccessException {
         WebSocketMock webSocketMockMaria = new WebSocketMock();
 
         server.onMessage(webSocketMockMaria, "enter_room:987:Maria");
 
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
+        List<String> bfMaria = (ArrayList<String>) buffer.get(webSocketMockMaria);
+
         assertAll(() -> {
             assertTrue(webSocketMockMaria.hasBufferedData());
             assertTrue(webSocketMock.hasBufferedData());
+            assertEquals("receive_message:0:Maria se conectou:Sala:enter_room:2:0", bf.get(0));
+            assertEquals("receive_message:0:Maria se conectou:Sala:enter_room:2:0", bfMaria.get(0));
         });
     }
 
@@ -102,18 +105,59 @@ public class ServerTest {
 
         Video video = new Video("youtube.com", "you.com", "PT20M1S", "Teste");
 
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
+
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
             assertEquals(video, room.nextVideo());
+            assertEquals("receive_message:0:Vídeo adicionado por Dayvson:Sala:add_video:1:1", bf.get(0));
         });
     }
 
     @Test
-    void onMessageListVideos(){
-        server.onMessage(webSocketMock, "list_videos:987");
+    void onMessageAddVideoWithOtherUsersOnRoom() throws NoSuchFieldException, IllegalAccessException {
+        WebSocketMock webSocketMockMaria = new WebSocketMock();
+
+        server.onMessage(webSocketMockMaria, "enter_room:987:Maria");
+
+        server.onMessage(webSocketMock, "add_video:987:Dayvson:youtube.com:you.com:PT20M1S:Teste");
+
+        Field roomList = Server.class.getDeclaredField("roomList");
+        roomList.setAccessible(true);
+
+        List<IRoom> roomList1 = (List<IRoom>) roomList.get(server);
+
+        IRoom room = roomList1.get(roomList1.indexOf(roomMock));
+
+        Video video = new Video("youtube.com", "you.com", "PT20M1S", "Teste");
+
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMockMaria);
 
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
+            assertEquals(video, room.nextVideo());
+            assertEquals("receive_message:0:Vídeo adicionado por Dayvson:Sala:add_video:2:1", bf.get(0));
+        });
+    }
+
+    @Test
+    void onMessageListVideos() throws NoSuchFieldException, IllegalAccessException {
+        server.onMessage(webSocketMock, "list_videos:987");
+
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
+
+        assertAll(() -> {
+            assertTrue(webSocketMock.hasBufferedData());
+            assertEquals("list_videos:0:" + "[]" + ":987", bf.get(0));
         });
     }
 
@@ -130,32 +174,49 @@ public class ServerTest {
 
         Video video = new Video("youtube.com", "you.com", "PT20M1S", "Teste");
 
-
         server.onMessage(webSocketMock, "get_video:987");
 
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
+
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
+            assertEquals("get_video:0:" + video + ":987", bf.get(0));
         });
     }
 
     @Test
-    void onMessageSendMessage(){
+    void onMessageSendMessage() throws NoSuchFieldException, IllegalAccessException {
         server.onMessage(webSocketMock, "send_message:987:Testando:Dayvson");
 
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
+
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
+            assertEquals("receive_message:0:Testando:Dayvson:receive_message:1:0", bf.get(0));
         });
     }
 
     @Test
-    void onMessageEnterRoomThatRoomDoesntExist(){
+    void onMessageEnterRoomThatRoomDoesntExist() throws NoSuchFieldException, IllegalAccessException {
         WebSocketMock webSocketMockMaria = new WebSocketMock();
 
         server.onMessage(webSocketMockMaria, "enter_room:789:Maria");
 
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMockMaria);
+
         assertAll(() -> {
             assertTrue(webSocketMockMaria.hasBufferedData());
             assertFalse(webSocketMock.hasBufferedData());
+            assertEquals("enter_room:1:Sala inexistente!:789", bf.get(0));
         });
     }
 
@@ -173,18 +234,30 @@ public class ServerTest {
 
         Video video = new Video("youtube.com", "you.com", "PT20M1S", "Teste");
 
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
+
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
             assertEquals(null, room.nextVideo());
+            assertEquals("add_video:1:Sala inexistente!:789", bf.get(0));
         });
     }
 
     @Test
-    void onMessageListVideosThatRoomDoesntExist(){
+    void onMessageListVideosThatRoomDoesntExist() throws NoSuchFieldException, IllegalAccessException {
         server.onMessage(webSocketMock, "list_videos:789");
+
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
 
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
+            assertEquals("list_videos:1:Sala inexistente!:789", bf.get(0));
         });
     }
 
@@ -201,20 +274,31 @@ public class ServerTest {
 
         Video video = new Video("youtube.com", "you.com", "PT20M1S", "Teste");
 
-
         server.onMessage(webSocketMock, "get_video:787");
+
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
 
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
+            assertEquals("get_video:1:Sala inexistente!:787", bf.get(0));
         });
     }
 
     @Test
-    void onMessageSendMessageThatRoomDoesntExist(){
+    void onMessageSendMessageThatRoomDoesntExist() throws NoSuchFieldException, IllegalAccessException {
         server.onMessage(webSocketMock, "send_message:897:Testando:Dayvson");
+
+        Field buffer = WebSocketMock.class.getDeclaredField("buffer");
+        buffer.setAccessible(true);
+
+        List<String> bf = (ArrayList<String>) buffer.get(webSocketMock);
 
         assertAll(() -> {
             assertTrue(webSocketMock.hasBufferedData());
+            assertEquals("send_message:1:Sala inexistente!:897", bf.get(0));
         });
     }
 

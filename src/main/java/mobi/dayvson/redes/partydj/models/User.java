@@ -39,7 +39,7 @@ public class User {
         return Objects.hash(name, webSocket);
     }
 
-    public String toString(){
+    public String toString() {
         return this.name;
     }
 }

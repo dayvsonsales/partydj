@@ -4,16 +4,16 @@ import mobi.dayvson.redes.partydj.enums.Message;
 
 public class Protocol {
 
-    private Protocol(){
+    private Protocol() {
 
     }
 
-    public static Message proccess(String message){
+    public static Message proccess(String message) {
 
         Message m = Message.UNKNOW;
         message = message.split(":")[0];
 
-        switch (message){
+        switch (message) {
             case "enter_room":
                 m = Message.ENTER_ROOM;
                 break;
@@ -40,7 +40,7 @@ public class Protocol {
         return m;
     }
 
-    public static String convert(Message message){
+    public static String convert(Message message) {
         return message.toString().toLowerCase();
     }
 
